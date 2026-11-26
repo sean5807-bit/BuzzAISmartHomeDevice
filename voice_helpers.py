@@ -3,6 +3,8 @@ This file is going to help interperet what the ai spits out and determines which
 file needs to run 
 """
 
+MAX_HISTORY_MESSAGES = 6  # how many past messages Buzz remembers
+
 #this is the prompt so far and needs to built on 
 SYSTEM_PROMPT = """You are Buzz, a voice assistant. Decide what the user wants.
 Reply with ONLY one line in this format:  TASK | value | detail
@@ -12,7 +14,7 @@ Tasks:
 WEATHER | <city> | <detail>
     Use for ANY weather question. If no city is given, use Atlanta.
     detail must be ONE of these words:
-    TEMPERATURE, FEELSLIKE, HUMIDITY, PRECIPITATION, WIND, CONDITION, UV, CLOUDS, ALL
+    TEMPERATURE, FEELSLIKE, HUMIDITY, PRECIPITATION, WIND, UV, ALL
     Use ALL if they ask about the weather in general.
 CHAT | <your short answer>
     Use for anything that is not about weather.
@@ -36,16 +38,31 @@ User: what's two plus two
 You: CHAT | Two plus two is four.
 """
 
-def buildPrompt(history, headText):
-    pass
+def buildPrompt(history, heardText):
+    messages = []
+    messages.append({"role": "system", "content": SYSTEM_PROMPT})
+    for hist in history[-MAX_HISTORY_MESSAGES:]:  # only the most recent messages
+        messages.append(hist)
+    messages.append({"role": "user", "content": heardText})
+    return messages
 
-def parseTask(reply): #goes through response from ai to return a value:
-    responseString = ""
-    splitReply = reply.split(" | ")
-    fileCall = splitReply[0].upper()
-    city = ""
-    task = ""
+
+
+def parseTask(reply): #goes through response from ai to return a value
+    if "|" not in reply:          # AI ignored the format, so treat it as a normal answer
+        return ("CHAT", [reply])
+
+    splitReply = reply.split("|")
+    fileCall = splitReply[0].strip().upper()
+    city = "Atlanta" # assumes atlanta if ai left the city out 
+    task = "ALL" #another assumptions 
     if fileCall == "WEATHER":
-        city = splitReply[1]
-        task = splitReply[2]
+        if len(splitReply) > 1:
+            city = splitReply[1].strip()
+        if len(splitReply) > 2:
+            task = splitReply[2].strip().upper()
+        return (fileCall, [city, task])
+    # can add more options later on 
+
+    return ("CHAT", [splitReply[1].strip()])
     
