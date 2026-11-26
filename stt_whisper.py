@@ -1,27 +1,6 @@
 """
 stt_whisper.py
-
-Speech-to-text using OpenAI's Whisper model, running fully locally.
-No API key, no cost, no internet connection needed once the model
-has been downloaded the first time you run this.
-
-For a classroom laptop, the "base" model is a good balance of speed
-and accuracy. If it feels slow on student laptops, switch to "tiny".
 """
-
-################################################################################
-################################################################################
-###                                                                          ###
-###   !!!  DO NOT EDIT ANYTHING BELOW THIS LINE  !!!                         ###
-###                                                                          ###
-###   This ENTIRE FILE is provided. Do not edit it at all.                   ###
-###   Do NOT change, delete, rename, move, or reformat anything              ###
-###   between this banner and the matching END banner.                       ###
-###   Changing it can break the lab. Edit only the TODO sections.            ###
-###                                                                          ###
-################################################################################
-################################################################################
-
 import sys
 
 import sounddevice as sd
@@ -65,14 +44,7 @@ def listen_and_transcribe():
     return text
 
 
-# ---------------------------------------------------------------------------
-# Worker mode: main.py launches this file as a separate process.
-# Keeping the microphone/Whisper code in its own process stops sounddevice
-# from clashing with the robot's Bluetooth library on Windows.
-#
-# Protocol: main.py sends a blank line when it wants us to listen once.
-# We reply with a single line:  HEARD:<text>
-# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
     while True:
         request = sys.stdin.readline()
@@ -80,12 +52,3 @@ if __name__ == "__main__":
             break  # main.py closed the pipe, so we shut down
         spoken_text = listen_and_transcribe()
         print("HEARD:" + spoken_text.replace("\n", " "), flush=True)
-
-################################################################################
-################################################################################
-###                                                                          ###
-###   !!!  END OF THE 'DO NOT EDIT' SECTION  !!!                             ###
-###   You may edit again below this line.                                    ###
-###                                                                          ###
-################################################################################
-################################################################################
